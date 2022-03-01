@@ -69,10 +69,17 @@ def main(max_time=20):
     args = parser.parse_args()
     print('Arguments:', args)
 
+    # No obstacle
     objects = {
         'water': 1,
         'ethanol': 2,
     }
+
+    # There is obstacle
+    #objects = {
+    #    'water': 2,
+    #    'ethanol': 1,
+    #}
 
     problem, samples, roadmap = create_problem(objects)
     constraints = PlanConstraints(max_cost=1.25) # max_cost=INF)
