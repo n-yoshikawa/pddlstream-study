@@ -1,9 +1,9 @@
 (define (stream pick-and-place)
-  (:stream motion-planning
+  (:stream find-motion
     :inputs (?obj)
     :fluents (AtConf)
     :domain (Object ?obj)
     :outputs ()
-    :certified (and (Placeable ?obj))
+    :certified (Placeable ?obj)
   )
 )

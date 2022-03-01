@@ -24,9 +24,10 @@ def create_problem(objects):
     stream_pddl = read(os.path.join(directory, 'stream.pddl'))
     constant_map = {}
 
-    init = [('Conf', 0), ('Object', 'water'), ('Object', 'ethanol')]
+    init = [('Conf', 0), ('Arm', 'myarm'), ('ArmEmpty', 'myarm')]
     for name, pos in objects.items():
-        init += [('AtConf', name, pos)]
+        init += [('Object', name), ('AtConf', name, pos)]
+    print("init:", init)
 
     goal = ('and', ('AtConf', 'water', 0), ('AtConf', 'ethanol', 0))
 
@@ -40,7 +41,7 @@ def create_problem(objects):
         return True
 
     stream_map = {
-        'motion-planning':  from_test(planning),
+        'find-motion':  from_test(planning),
     }
 
     problem = PDDLProblem(domain_pddl, constant_map, stream_pddl, stream_map, init, goal)
