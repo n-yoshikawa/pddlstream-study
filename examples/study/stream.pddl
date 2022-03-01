@@ -4,6 +4,6 @@
     :fluents (AtConf)
     :domain (Object ?obj)
     :outputs ()
-    :certified (Placeable ?obj)
+    :certified (Movable ?obj)
   )
 )

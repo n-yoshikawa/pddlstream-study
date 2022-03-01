@@ -29,19 +29,28 @@ def create_problem(objects):
         init += [('Object', name), ('AtConf', name, pos)]
     print("init:", init)
 
-    goal = ('and', ('AtConf', 'water', 0), ('AtConf', 'ethanol', 0))
+    goal = ('AtConf', 'water', 0)
 
     samples = []
     roadmap = []
 
-    def planning(obj, fluents=[]):
+    def test_movable(obj, fluents=[]):
         print("fluents:", fluents)
+        #return True
+        water_pos = None
+        ethanol_pos = None
         for i, fluent in enumerate(fluents):
-            print(fluent)
-        return True
+            if fluent[1] == 'water':
+                water_pos = fluent[2]
+            elif fluent[1] == 'ethanol':
+                ethanol_pos = fluent[2]
+        if water_pos > ethanol_pos:
+            return False
+        else:
+            return True
 
     stream_map = {
-        'find-motion':  from_test(planning),
+        'find-motion':  from_test(test_movable),
     }
 
     problem = PDDLProblem(domain_pddl, constant_map, stream_pddl, stream_map, init, goal)
@@ -59,8 +68,8 @@ def main(max_time=20):
     print('Arguments:', args)
 
     objects = {
-        'water': 2,
-        'ethanol': 1,
+        'water': 1,
+        'ethanol': 2,
     }
 
     problem, samples, roadmap = create_problem(objects)
