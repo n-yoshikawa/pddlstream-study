@@ -25,18 +25,20 @@ def create_problem(objects):
     constant_map = {}
 
     init = [('Conf', 0), ('Arm', 'myarm'), ('ArmEmpty', 'myarm')]
+
+    # Set object positions
     for name, pos in objects.items():
         init += [('Object', name), ('AtConf', name, pos)]
-    print("init:", init)
 
+    # Bring water to 0
     goal = ('AtConf', 'water', 0)
 
     samples = []
     roadmap = []
 
+    # Check whether ethanol is an obstacle
     def test_movable(obj, fluents=[]):
         print("fluents:", fluents)
-        #return True
         water_pos = None
         ethanol_pos = None
         for i, fluent in enumerate(fluents):
@@ -44,9 +46,9 @@ def create_problem(objects):
                 water_pos = fluent[2]
             elif fluent[1] == 'ethanol':
                 ethanol_pos = fluent[2]
-        if water_pos > ethanol_pos:
+        if water_pos > ethanol_pos: # ethanol is an obstacle
             return False
-        else:
+        else:  # ethanol is not an obstacle
             return True
 
     stream_map = {
