@@ -1,9 +1,9 @@
 (define (stream pick-and-place)
   (:stream find-motion
-    :inputs (?obj)
+    :inputs (?obj ?start ?end)
     :fluents (AtConf)
-    :domain (Object ?obj)
+    :domain (and (Object ?obj) (ObjectPose ?start) (ObjectPose ?end))
     :outputs ()
-    :certified (Movable ?obj)
+    :certified (Movable ?obj ?start ?end)
   )
 )
