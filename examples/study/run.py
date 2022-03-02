@@ -4,7 +4,7 @@ import os
 import numpy as np
 
 from pddlstream.algorithms.meta import create_parser
-from examples.study.viewer import sample_box, get_distance, is_collision_free, \
+from experiments.study.viewer import sample_box, get_distance, is_collision_free, \
     create_box, draw_solution, draw_roadmap, draw_environment
 from pddlstream.algorithms.incremental import solve_incremental
 from pddlstream.algorithms.meta import solve
@@ -24,11 +24,11 @@ def create_problem(objects):
     stream_pddl = read(os.path.join(directory, 'stream.pddl'))
     constant_map = {}
 
-    init = [('Conf', 0), ('Arm', 'myarm'), ('ArmEmpty', 'myarm')]
+    init = [('Conf', 0), ('Arm', 'myarm'), ('ArmEmpty', 'myarm'),('ObjectPose', 0),('ObjectPose', -1)]
 
     # Set object positions
     for name, pos in objects.items():
-        init += [('Object', name), ('AtConf', name, pos)]
+        init += [('Object', name), ('AtConf', name, pos),('ObjectPose', pos)]
 
     # Bring water to 0
     goal = ('AtConf', 'water', 0)
@@ -37,7 +37,7 @@ def create_problem(objects):
     roadmap = []
 
     # Check whether ethanol is an obstacle
-    def test_movable(obj, fluents=[]):
+    def test_movable(obj, s, e, fluents=[]):
         print("fluents:", fluents)
         water_pos = None
         ethanol_pos = None
@@ -46,10 +46,17 @@ def create_problem(objects):
                 water_pos = fluent[2]
             elif fluent[1] == 'ethanol':
                 ethanol_pos = fluent[2]
-        if water_pos > ethanol_pos: # ethanol is an obstacle
-            return False
-        else:  # ethanol is not an obstacle
-            return True
+        if obj == 'water':
+            # trying to move the water from s to e but
+            # ethanol in the middle
+            if (s <= ethanol_pos <= e) or (s >= ethanol_pos >= e):
+                return
+        elif obj == 'ethanol':
+            # trying to move the ethanol from s to e but
+            # water in the middle
+            if (s <= water_pos <= e) or (s >= water_pos >= e):
+                return
+        return True
 
     stream_map = {
         'find-motion':  from_test(test_movable),
@@ -76,10 +83,10 @@ def main(max_time=20):
     }
 
     # There is obstacle
-    #objects = {
-    #    'water': 2,
-    #    'ethanol': 1,
-    #}
+    objects = {
+       'water': 2,
+       'ethanol': 1,
+    }
 
     problem, samples, roadmap = create_problem(objects)
     constraints = PlanConstraints(max_cost=1.25) # max_cost=INF)
