@@ -36,26 +36,14 @@ def create_problem(objects):
     samples = []
     roadmap = []
 
-    # Check whether ethanol is an obstacle
     def test_movable(obj, s, e, fluents=[]):
-        print("fluents:", fluents)
-        water_pos = None
-        ethanol_pos = None
-        for i, fluent in enumerate(fluents):
-            if fluent[1] == 'water':
-                water_pos = fluent[2]
-            elif fluent[1] == 'ethanol':
-                ethanol_pos = fluent[2]
-        if obj == 'water':
-            # trying to move the water from s to e but
-            # ethanol in the middle
-            if (s <= ethanol_pos <= e) or (s >= ethanol_pos >= e):
-                return
-        elif obj == 'ethanol':
-            # trying to move the ethanol from s to e but
-            # water in the middle
-            if (s <= water_pos <= e) or (s >= water_pos >= e):
-                return
+        for fluent in fluents:
+            if fluent[1] != obj:
+                pos = fluent[2]
+                if pos < 0:
+                    continue
+                if (s <= pos <= e) or (s >= pos >= e):
+                    return False
         return True
 
     stream_map = {
@@ -71,22 +59,18 @@ def create_problem(objects):
 
 # TODO: algorithms that take advantage of metric space (RRT)
 
-def main(max_time=20):
+def main(max_time=600):
     parser = create_parser()
     args = parser.parse_args()
     print('Arguments:', args)
 
-    # No obstacle
+    # 3 obstacles case worked, 4 obstacles didn't
     objects = {
-        'water': 1,
-        'ethanol': 2,
+        'water': 4,
+        #'coffee': 3,
+        'wine': 2,
+        'vodka': 1,
     }
-
-    # There is obstacle
-    #objects = {
-    #    'water': 2,
-    #    'ethanol': 1,
-    #}
 
     problem, samples, roadmap = create_problem(objects)
     constraints = PlanConstraints(max_cost=1.25) # max_cost=INF)
