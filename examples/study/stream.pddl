@@ -6,4 +6,10 @@
     :outputs ()
     :certified (Movable ?obj ?start ?end)
   )
+  (:stream find-motion-each
+    :inputs (?obstacle ?obstacle_pos ?start ?end)
+    :domain (and (Object ?obstacle) (ObjectPose ?obstacle_pos) (ObjectPose ?start) (ObjectPose ?end))
+    :outputs ()
+    :certified (MovableEach ?obstacle ?obstacle_pos ?start ?end)
+  )
 )

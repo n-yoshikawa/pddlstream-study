@@ -46,8 +46,15 @@ def create_problem(objects):
                     return False
         return True
 
+    def test_movable_each(obstacle, obstacle_pos, start, end):
+        print(f"test_movable_each obstacle: {obstacle}")
+        if (s < pos <= e) or (s > pos >= e):
+            return False
+        return True
+
     stream_map = {
         'find-motion':  from_test(test_movable),
+        'find-motion-each':  from_test(test_movable_each),
     }
 
     problem = PDDLProblem(domain_pddl, constant_map, stream_pddl, stream_map, init, goal)
