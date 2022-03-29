@@ -11,6 +11,8 @@
         (coordinate ?xyz)
         (grasppose ?block ?handpose)
         (pourpose ?block ?handpose)
+        (placeposition ?block ?place_pos)
+        (placepose ?block ?handpose)
         (motion ?arm ?cur_handpose ?new_handpose ?traj)
 
         ; fluents 
@@ -39,14 +41,20 @@
         )
     )
     (:action place
-        :parameters (?arm ?block)
+        :parameters (?arm ?block ?place_pos ?cur_handpose ?new_handpose ?traj)
         :precondition (and
             (arm ?arm)
             (block ?block)
             (picked ?arm ?block)
+            (placeposition ?block ?place_pos)
+            (handpose ?cur_handpose)
+            (athandpose ?arm ?cur_handpose)
+            (placepose ?block ?new_handpose)
+            (motion ?arm ?cur_handpose ?new_handpose ?traj)
         ) 
         :effect (and
             (empty ?arm)
+            (not (picked ?arm ?block))
         )
     )
     (:action pour

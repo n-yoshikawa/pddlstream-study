@@ -99,7 +99,7 @@ def create_problem(objects, env):
         init += [('block', name), ('atconf', name, pos), ('coordinate', pos)]
         env.add_box(pos, [0.05, 0.05, 0.1])
 
-    goal = ('and', ('picked', 'myarm', 'water'), ('poured', 'myarm', 'vodka'), ('empty', 'myarm'))
+    goal = ('and', ('poured', 'myarm', 'vodka'), ('empty', 'myarm'))
 
     samples = []
     roadmap = []
@@ -126,11 +126,25 @@ def create_problem(objects, env):
             handpose = env.inverse_kinematics(grasp_pos, orientation)
             yield (handpose,)
 
+    def find_place(block):
+        while True:
+            yield ((1, 0, 0),)
+
+    def find_place_pose(block, block_pos):
+        orientation = p.getQuaternionFromEuler([math.pi, 0, 0])
+        place_pos = (block_pos[0], block_pos[1], block_pos[2]+0.5)
+        while True:
+            handpose = env.inverse_kinematics(place_pos, orientation)
+            yield (handpose,)
+
     stream_map = {
         "find-traj": from_gen_fn(find_motion),
         "find-traj-pour": from_gen_fn(find_motion),
+        "find-traj-place": from_gen_fn(find_motion),
         "find-grasp": from_gen_fn(find_grasp),
         "find-pour": from_gen_fn(find_pour),
+        "find-place": from_gen_fn(find_place),
+        "find-place-pose": from_gen_fn(find_place_pose),
     }
 
     problem = PDDLProblem(domain_pddl, constant_map, stream_pddl, stream_map, init, goal)
@@ -168,9 +182,14 @@ def main(max_time=600):
 
     input('Run?')
     for action in solution.plan:
-        if action.name == 'pick' or action.name == 'pour':
-            path = action.args[-1]
-            env.run_path(path)
+        path = action.args[-1]
+        env.run_path(path)
+        if action.name == 'place':
+            if action.args[1] == 'water':
+                obj_id = env.obstacles[0]
+            else:
+                obj_id = env.obstacles[1]
+            p.resetBasePositionAndOrientation(obj_id, action.args[2], (0, 0, 0, 1.0))
     input('Finish?')
 
 
